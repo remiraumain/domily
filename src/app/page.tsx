@@ -57,6 +57,7 @@ export default async function Home() {
         </div>
 
         <CrudShowcase />
+        <Link href="/testPage">Page Test</Link>
       </div>
     </main>
   );
