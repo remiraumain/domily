@@ -57,7 +57,9 @@ export default async function Home() {
         </div>
 
         <CrudShowcase />
-        <Link href="/testPage">Page Test</Link>
+        <Link href="/test" className="mb-40">
+          Page Test
+        </Link>
       </div>
     </main>
   );

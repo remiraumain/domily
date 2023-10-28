@@ -4,11 +4,11 @@ import { Inter } from "next/font/google";
 import { headers } from "next/headers";
 
 import { TRPCReactProvider } from "~/trpc/react";
-import { ModalProvider } from "~/components/providers/modal-provider";
 import SessionProvider from "~/components/providers/session-provider";
-
-import Navbar from "~/components/navbar";
 import { getServerAuthSession } from "~/server/auth";
+
+import { ModalProvider } from "~/components/providers/modal-provider";
+import { Navbar } from "./_components/navbar";
 
 const inter = Inter({
   subsets: ["latin"],
