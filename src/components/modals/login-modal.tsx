@@ -42,7 +42,7 @@ export const LoginModal = () => {
 
   const isLoading = form.formState.isSubmitting;
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+  const onSubmit = (data: z.infer<typeof formSchema>) => {
     console.log(data);
   };
 
