@@ -20,9 +20,17 @@ export default function Signin() {
       <h2 className="text-xl font-bold">Bienvenue sur Domily</h2>
       <SignInForm />
       {type === "default" || type === "login" ? (
-        <button onClick={() => signIn("google", { callbackUrl: "/" })}>
-          Sign in with Google
-        </button>
+        <div>
+          <button onClick={() => signIn("google", { callbackUrl: "/" })}>
+            Sign in with Google
+          </button>
+          <button onClick={() => signIn("facebook", { callbackUrl: "/" })}>
+            Sign in with Facebook
+          </button>
+          <button onClick={() => signIn("discord", { callbackUrl: "/" })}>
+            Sign in with Discord
+          </button>
+        </div>
       ) : null}
     </main>
   );
