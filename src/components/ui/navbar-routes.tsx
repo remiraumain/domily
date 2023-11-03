@@ -19,7 +19,7 @@ export const NavbarRoutes = () => {
             key={link.label}
             href={
               link.route === "/profile" && !authenticated
-                ? "/api/auth/signin"
+                ? "/signin"
                 : link.route
             }
             className="flex w-[60px] flex-col items-center justify-center gap-2"

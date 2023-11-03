@@ -1,14 +1,18 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
+import { eq } from "drizzle-orm";
 import {
   getServerSession,
   type DefaultSession,
   type NextAuthOptions,
 } from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 import DiscordProvider from "next-auth/providers/discord";
+import GoogleProvider from "next-auth/providers/google";
 
 import { env } from "~/env.mjs";
 import { db } from "~/server/db";
-import { mysqlTable } from "~/server/db/schema";
+import bcrypt from "bcrypt";
+import { mysqlTable, users } from "~/server/db/schema";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -37,20 +41,106 @@ declare module "next-auth" {
  * @see https://next-auth.js.org/configuration/options
  */
 export const authOptions: NextAuthOptions = {
+  secret: env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    session: ({ session, user, token }) => {
+      if (user) {
+        console.log("token", token);
+        console.log("session", session);
+        return {
+          ...session,
+          user: {
+            ...session.user,
+            id: user.id,
+          },
+        };
+      }
+      return {
+        ...session,
+        user: {
+          ...token,
+        },
+      };
+    },
+    jwt: async ({ token, user }) => {
+      if (user) {
+        return {
+          ...token,
+          id: user.id,
+        };
+      }
+      return token;
+    },
   },
   adapter: DrizzleAdapter(db, mysqlTable),
   providers: [
+    Credentials({
+      id: "credentials",
+      name: "Credentials",
+      credentials: {
+        email: {
+          label: "Email",
+          type: "text",
+          placeholder: "your@email.com",
+        },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error("Invalid email or password");
+          }
+
+          const user = await db.query.users.findFirst({
+            where: eq(users.email, credentials.email),
+            with: {
+              accounts: true,
+            },
+          });
+
+          if (!user) {
+            throw new Error("Invalid email or password");
+          }
+
+          // const hasAccount = user.accounts.length > 0;
+          // if (hasAccount) {
+          //   // Need more work to show to the client which account to connect to
+          // }
+
+          if (!user.password) {
+            throw new Error("Password not set");
+          }
+          const valid = await bcrypt.compare(
+            credentials.password,
+            user.password,
+          );
+          if (!valid) {
+            throw new Error("Invalid email or password");
+          }
+
+          return {
+            id: user.id,
+            name: user.firstName + " " + user.lastName,
+            email: user.email,
+            image: user.image,
+          };
+        } catch (error) {
+          console.log("[AUTH]", error);
+          throw new Error("Internal error");
+        }
+      },
+    }),
     DiscordProvider({
       clientId: env.DISCORD_CLIENT_ID,
       clientSecret: env.DISCORD_CLIENT_SECRET,
+    }),
+    GoogleProvider({
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
     }),
     /**
      * ...add more providers here.
@@ -62,9 +152,9 @@ export const authOptions: NextAuthOptions = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
-  // pages: {
-  //   signIn: "/signin",
-  // },
+  pages: {
+    signIn: "/signin",
+  },
 };
 
 /**
