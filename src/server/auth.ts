@@ -67,7 +67,7 @@ export const authOptions: NextAuthOptions = {
         },
       };
     },
-    jwt: async ({ token, user }) => {
+    jwt: ({ token, user }) => {
       if (user) {
         return {
           ...token,

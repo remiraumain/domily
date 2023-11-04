@@ -20,7 +20,7 @@ const formSchema = z.object({
 });
 
 export const LoginForm = () => {
-  const { email } = useFormSignIn();
+  const { email, provider } = useFormSignIn();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -38,6 +38,10 @@ export const LoginForm = () => {
       callbackUrl: "/",
     });
   };
+
+  if (provider !== "all") {
+    return null;
+  }
 
   return (
     <Form {...form}>

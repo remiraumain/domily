@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, gt } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
@@ -13,13 +13,24 @@ import { NextResponse } from "next/server";
 import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
-  isUserByEmail: publicProcedure
+  shouldRegister: publicProcedure
     .input(z.object({ email: z.string().email() }))
     .mutation(async ({ ctx, input }) => {
       const user = await ctx.db.query.users.findFirst({
         where: eq(users.email, input.email),
+        with: {
+          accounts: true,
+        },
       });
-      return !!user;
+      if (!user) {
+        return { value: true };
+      }
+
+      if (user.accounts.length > 0) {
+        return { value: false, provider: user.accounts[0]?.provider };
+      }
+
+      return { value: false };
     }),
 
   create: publicProcedure
@@ -33,11 +44,20 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const exist = await ctx.db.query.users.findFirst({
+      const user = await ctx.db.query.users.findFirst({
         where: eq(users.email, input.email),
+        with: {
+          accounts: true,
+        },
       });
 
-      if (exist) {
+      if (!!user && user.accounts.length > 0) {
+        throw new Error(
+          `User already exists with a ${user.accounts[0]?.provider} account`,
+        );
+      }
+
+      if (!!user) {
         throw new Error("User already exists");
       }
 

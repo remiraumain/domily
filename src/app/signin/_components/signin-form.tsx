@@ -13,23 +13,30 @@ import {
   FormLabel,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { useFormSignIn } from "~/hooks/use-signin-store";
+import { ProviderType, useFormSignIn } from "~/hooks/use-signin-store";
 import { api } from "~/trpc/react";
 import { LoginForm } from "./login-form";
 import { RegisterForm } from "./register-form";
+import { set } from "date-fns";
 
 const formSchema = z.object({
   email: z.string().email(),
 });
 
 export const SignInForm = () => {
-  const { setForm, setEmail, type, email } = useFormSignIn();
-  const user = api.user.isUserByEmail.useMutation();
+  const { setForm, setEmail, setProvider, type } = useFormSignIn();
+  const user = api.user.shouldRegister.useMutation();
   const { data } = user;
 
   useEffect(() => {
-    if (data !== undefined) {
-      setForm(data ? "login" : "register");
+    if (!!data) {
+      console.log(data);
+      if (data.provider !== undefined) {
+        setProvider(data.provider as ProviderType);
+        setForm("login");
+      } else {
+        setForm(data.value ? "register" : "login");
+      }
     }
   }, [data]);
 

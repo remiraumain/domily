@@ -3,9 +3,10 @@
 import { signIn } from "next-auth/react";
 import { SignInForm } from "./_components/signin-form";
 import { useFormSignIn } from "~/hooks/use-signin-store";
+import { Providers } from "./_components/providers";
 
 export default function Signin() {
-  const { reset, type } = useFormSignIn();
+  const { reset, type, provider } = useFormSignIn();
 
   return (
     <main className="px-7">
@@ -20,17 +21,7 @@ export default function Signin() {
       <h2 className="text-xl font-bold">Bienvenue sur Domily</h2>
       <SignInForm />
       {type === "default" || type === "login" ? (
-        <div>
-          <button onClick={() => signIn("google", { callbackUrl: "/" })}>
-            Sign in with Google
-          </button>
-          <button onClick={() => signIn("facebook", { callbackUrl: "/" })}>
-            Sign in with Facebook
-          </button>
-          <button onClick={() => signIn("discord", { callbackUrl: "/" })}>
-            Sign in with Discord
-          </button>
-        </div>
+        <Providers provider={provider} />
       ) : null}
     </main>
   );
