@@ -9,7 +9,7 @@ import {
 export const links = [
   {
     route: "/",
-    label: "Home",
+    label: "Explorer",
     icon: PiMagnifyingGlass,
     showUnauthenticated: true,
   },

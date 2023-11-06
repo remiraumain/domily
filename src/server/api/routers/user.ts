@@ -1,4 +1,4 @@
-import { eq, gt } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
@@ -9,8 +9,6 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { users } from "~/server/db/schema";
-import { NextResponse } from "next/server";
-import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
   shouldRegister: publicProcedure
