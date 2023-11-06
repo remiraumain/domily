@@ -11,10 +11,7 @@ export const UserMenu = () => {
   return (
     <div className="relative hidden flex-1 md:block">
       <div className="flex flex-row items-center justify-end gap-3">
-        <div
-          onClick={() => {}}
-          className="hidden cursor-pointer rounded-full px-4 py-3 text-sm font-semibold transition hover:bg-neutral-100 md:block"
-        >
+        <div className="hidden cursor-pointer rounded-full px-4 py-3 text-sm font-semibold transition hover:bg-neutral-100 md:block">
           Domily your home
         </div>
         <Popover>
