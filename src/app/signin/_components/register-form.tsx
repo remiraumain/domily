@@ -59,12 +59,18 @@ export const RegisterForm = () => {
     });
   }
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: {
+    firstname: string;
+    lastname: string;
+    birthday: string;
+    email: string;
+    password: string;
+  }) => {
     console.log(data);
     user.mutate({
       firstName: data.firstname,
       lastName: data.lastname,
-      birthday: data.birthday,
+      birthday: new Date(data.birthday),
       email: data.email,
       password: data.password,
     });

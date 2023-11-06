@@ -31,7 +31,7 @@ export const LoginForm = () => {
 
   const isLoading = form.formState.isSubmitting;
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: { email: string; password: string }) => {
     signIn("credentials", {
       email: data.email,
       password: data.password,
