@@ -40,15 +40,15 @@ export const RegisterForm = () => {
 
   const isLoading = form.formState.isSubmitting;
 
-  if (user.isSuccess) {
+  const login = () => {
     signIn("credentials", {
       email: form.getValues("email"),
       password: form.getValues("password"),
       callbackUrl: "/",
     });
-  }
-  // @typescript-eslint/no-floating-promises
-  const onSubmit = async (data: {
+  };
+
+  const onSubmit = (data: {
     firstname: string;
     lastname: string;
     birthday: string;
@@ -62,6 +62,9 @@ export const RegisterForm = () => {
       email: data.email,
       password: data.password,
     });
+    if (user.isSuccess) {
+      login();
+    }
   };
 
   return (
@@ -132,7 +135,7 @@ export const RegisterForm = () => {
           )}
         />
         <p>
-          En cliquant sur Accepter et continuer, j'accepte les Conditions
+          En cliquant sur Accepter et continuer, j&apos;accepte les Conditions
           générales, les Conditions de service relatives aux paiements, la
           Politique de non-discrimination et je reconnais avoir pris
           connaissance de la Politique de confidentialité de Domily.
