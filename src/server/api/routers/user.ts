@@ -3,11 +3,7 @@ import { z } from "zod";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { users } from "~/server/db/schema";
 
 export const userRouter = createTRPCRouter({

@@ -10,12 +10,6 @@ import {
   FormItem,
   FormLabel,
 } from "~/components/ui/form";
-import { Calendar } from "~/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
 import { Input } from "~/components/ui/input";
 import { useFormSignIn } from "~/hooks/use-signin-store";
 import { DatePicker } from "~/components/ui/date-time-picker";
@@ -53,8 +47,8 @@ export const RegisterForm = () => {
       callbackUrl: "/",
     });
   }
-
-  const onSubmit = (data: {
+  // @typescript-eslint/no-floating-promises
+  const onSubmit = async (data: {
     firstname: string;
     lastname: string;
     birthday: string;
