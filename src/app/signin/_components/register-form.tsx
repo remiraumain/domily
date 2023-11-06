@@ -40,15 +40,15 @@ export const RegisterForm = () => {
 
   const isLoading = form.formState.isSubmitting;
 
-  const login = () => {
-    signIn("credentials", {
+  const login = async () => {
+    await signIn("credentials", {
       email: form.getValues("email"),
       password: form.getValues("password"),
       callbackUrl: "/",
     });
   };
 
-  const onSubmit = (data: {
+  const onSubmit = async (data: {
     firstname: string;
     lastname: string;
     birthday: string;
@@ -63,7 +63,7 @@ export const RegisterForm = () => {
       password: data.password,
     });
     if (user.isSuccess) {
-      login();
+      await login();
     }
   };
 
