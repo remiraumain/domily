@@ -49,7 +49,7 @@ export const SignInForm = () => {
 
   const isLoading = form.formState.isSubmitting;
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: { email: string }) => {
     user.mutate({ email: data.email });
     setEmail(data.email);
   };

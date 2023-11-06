@@ -31,8 +31,8 @@ export const LoginForm = () => {
 
   const isLoading = form.formState.isSubmitting;
 
-  const onSubmit = (data: { email: string; password: string }) => {
-    signIn("credentials", {
+  const onSubmit = async (data: { email: string; password: string }) => {
+    await signIn("credentials", {
       email: data.email,
       password: data.password,
       callbackUrl: "/",

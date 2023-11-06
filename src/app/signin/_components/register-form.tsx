@@ -66,7 +66,6 @@ export const RegisterForm = () => {
     email: string;
     password: string;
   }) => {
-    console.log(data);
     user.mutate({
       firstName: data.firstname,
       lastName: data.lastname,
