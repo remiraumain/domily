@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  PiCalendarBlank,
-  PiMagnifyingGlass,
-  PiNavigationArrow,
-  PiSlidersHorizontal,
-  PiUsers,
-} from "react-icons/pi";
+import { PiCalendarBlank, PiNavigationArrow, PiUsers } from "react-icons/pi";
 
 export const Search = () => {
   return (

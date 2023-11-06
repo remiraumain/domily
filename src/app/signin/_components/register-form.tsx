@@ -18,11 +18,6 @@ import {
 } from "~/components/ui/popover";
 import { Input } from "~/components/ui/input";
 import { useFormSignIn } from "~/hooks/use-signin-store";
-
-import { PiCalendarBlank } from "react-icons/pi";
-import { useState } from "react";
-import { format } from "date-fns";
-import { cn } from "~/lib/utils";
 import { DatePicker } from "~/components/ui/date-time-picker";
 import { api } from "~/trpc/react";
 import { signIn } from "next-auth/react";
@@ -36,7 +31,7 @@ const formSchema = z.object({
 });
 
 export const RegisterForm = () => {
-  const { setForm, setEmail, email } = useFormSignIn();
+  const { email } = useFormSignIn();
   const user = api.user.create.useMutation();
   const form = useForm({
     resolver: zodResolver(formSchema),

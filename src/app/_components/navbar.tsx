@@ -28,7 +28,7 @@ export const Navbar = () => {
       <Container className="py-2">
         <div className="flex flex-row items-center justify-between gap-6">
           <Logo className="hidden min-w-fit flex-none sm:block md:flex-1" />
-          <Search />
+          {hasSearch ? <Search /> : null}
           <UserMenu />
         </div>
       </Container>

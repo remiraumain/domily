@@ -1,4 +1,3 @@
-import { useCallback, useState } from "react";
 import { PiEquals } from "react-icons/pi";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
@@ -9,12 +8,6 @@ import {
 import { MenuItem } from "./menu-item";
 
 export const UserMenu = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleOpen = useCallback(() => {
-    setIsOpen((prev: boolean) => !prev);
-  }, []);
-
   return (
     <div className="relative hidden flex-1 md:block">
       <div className="flex flex-row items-center justify-end gap-3">

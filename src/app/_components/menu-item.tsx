@@ -1,10 +1,9 @@
 interface MenuItemProps {
-  className?: string;
   label: string;
   onClick?: () => void;
 }
 
-export const MenuItem = ({ className, label, onClick }: MenuItemProps) => {
+export const MenuItem = ({ label, onClick }: MenuItemProps) => {
   return (
     <div
       onClick={onClick}

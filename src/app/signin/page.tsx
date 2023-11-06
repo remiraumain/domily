@@ -1,6 +1,5 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { SignInForm } from "./_components/signin-form";
 import { useFormSignIn } from "~/hooks/use-signin-store";
 import { Providers } from "./_components/providers";

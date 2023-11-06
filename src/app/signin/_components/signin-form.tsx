@@ -13,11 +13,11 @@ import {
   FormLabel,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { ProviderType, useFormSignIn } from "~/hooks/use-signin-store";
+import { useFormSignIn } from "~/hooks/use-signin-store";
+import type { ProviderType } from "~/hooks/use-signin-store";
 import { api } from "~/trpc/react";
 import { LoginForm } from "./login-form";
 import { RegisterForm } from "./register-form";
-import { set } from "date-fns";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -38,7 +38,7 @@ export const SignInForm = () => {
         setForm(data.value ? "register" : "login");
       }
     }
-  }, [data]);
+  }, [data, setForm, setProvider]);
 
   const form = useForm({
     resolver: zodResolver(formSchema),

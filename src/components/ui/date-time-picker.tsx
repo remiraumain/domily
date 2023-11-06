@@ -11,7 +11,7 @@ import {
 import { cn } from "~/lib/utils";
 import { format } from "date-fns";
 import { PiCalendarBlank as CalendarIcon } from "react-icons/pi";
-import { SelectSingleEventHandler } from "react-day-picker";
+import type { SelectSingleEventHandler } from "react-day-picker";
 
 interface DatePickerProps {
   selected?: Date;
