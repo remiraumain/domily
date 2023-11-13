@@ -11,34 +11,29 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { useFormSignIn } from "~/hooks/use-signin-store";
 import type { ProviderType } from "~/hooks/use-signin-store";
 import { api } from "~/trpc/react";
-import { LoginForm } from "./login-form";
-import { RegisterForm } from "./register-form";
 
 const formSchema = z.object({
   email: z.string().email(),
 });
 
-export const SignInForm = () => {
-  const { setForm, setEmail, setProvider, type } = useFormSignIn();
+export const SigninForm = () => {
+  const { setForm, reset, setProvider, type } = useFormSignIn();
   const user = api.user.shouldRegister.useMutation();
   const { data } = user;
 
   useEffect(() => {
-    if (!!data) {
-      console.log(data);
-      if (data.provider !== undefined) {
-        setProvider(data.provider as ProviderType);
-        setForm("login");
-      } else {
-        setForm(data.value ? "register" : "login");
+    if (user.isSuccess) {
+      if (user.data.provider !== undefined) {
+        setProvider(user.data.provider);
       }
     }
-  }, [data, setForm, setProvider]);
+  }, [user]);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -49,36 +44,39 @@ export const SignInForm = () => {
 
   const isLoading = form.formState.isSubmitting;
 
-  const onSubmit = (data: { email: string }) => {
+  const onSubmit = (data: z.infer<typeof formSchema>) => {
     user.mutate({ email: data.email });
-    setEmail(data.email);
   };
 
-  // Render the form based on the type
-  if (type === "login") {
-    return <LoginForm />;
-  }
-
-  if (type === "register") {
-    return <RegisterForm />;
-  }
+  const handleChange: React.FormEventHandler = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    if (e.target.value === "") {
+      setProvider("all");
+    }
+    console.log(e.target.value);
+  };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        onChange={(e) => handleChange(e)}
+      >
         <FormField
-          name="email"
           control={form.control}
+          name="email"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input disabled={isLoading} placeholder="Email" {...field} />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
-        <Button disabled={isLoading}>Continuer</Button>
+        <Button disabled={isLoading}>Register</Button>
       </form>
     </Form>
   );

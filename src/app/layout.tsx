@@ -9,7 +9,8 @@ import { getServerAuthSession } from "~/server/auth";
 import SessionProvider from "~/components/providers/session-provider";
 import { ModalProvider } from "~/components/providers/modal-provider";
 
-import { Navbar } from "./_components/navbar";
+import { Navbar } from "./(main)/_components/navbar";
+import { redirect, usePathname } from "next/navigation";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,7 +29,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerAuthSession();
-
   return (
     <html lang="en">
       <body className={`font-sans ${inter.variable}`}>

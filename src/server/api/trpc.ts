@@ -55,7 +55,6 @@ export const createInnerTRPCContext = async (opts: CreateContextOptions) => {
  */
 export const createTRPCContext = async (opts: { req: NextRequest }) => {
   // Fetch stuff that depends on the request
-
   return await createInnerTRPCContext({
     headers: opts.req.headers,
   });

@@ -1,6 +1,7 @@
 "use client";
 
-import { LoginModal } from "../modals/login-modal";
+import { SigninModal } from "../modals/signin-modal";
+import { ProfileCompleteModal } from "../modals/profile-complete-modal";
 
 import { useEffect, useState } from "react";
 
@@ -14,7 +15,8 @@ export const ModalProvider = () => {
   if (!isMounted) return null;
   return (
     <>
-      <LoginModal />
+      <SigninModal />
+      <ProfileCompleteModal />
     </>
   );
 };

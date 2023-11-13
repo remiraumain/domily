@@ -1,19 +1,18 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import { eq } from "drizzle-orm";
 import {
   getServerSession,
   type DefaultSession,
   type NextAuthOptions,
 } from "next-auth";
-import Credentials from "next-auth/providers/credentials";
+import EmailProvider from "next-auth/providers/email";
 import DiscordProvider from "next-auth/providers/discord";
 import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 
 import { env } from "~/env.mjs";
 import { db } from "~/server/db";
-import bcrypt from "bcrypt";
 import { mysqlTable, users } from "~/server/db/schema";
+import { eq } from "drizzle-orm";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -27,13 +26,14 @@ declare module "next-auth" {
       id: string;
       // ...other properties
       // role: UserRole;
+      completed: boolean;
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    // ...other properties
+    // role: UserRole;
+  }
 }
 
 /**
@@ -43,97 +43,42 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   secret: env.NEXTAUTH_SECRET,
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+  pages: {
+    signIn: "?modal=signin",
   },
   callbacks: {
-    session: ({ session, user, token }) => {
-      if (user) {
-        console.log("token", token);
-        console.log("session", session);
-        return {
-          ...session,
-          user: {
-            ...session.user,
-            id: user.id,
-          },
-        };
-      }
+    session: async ({ session, user }) => {
+      const dbUser = await db.query.users.findFirst({
+        where: eq(users.id, user.id),
+      });
       return {
         ...session,
         user: {
-          ...token,
+          ...session.user,
+          id: user.id,
+          completed: dbUser?.completed,
         },
       };
     },
-    jwt: ({ token, user }) => {
-      if (user) {
-        return {
-          ...token,
-          id: user.id,
-        };
+    signIn: async ({ user }) => {
+      if (user.id) {
+        return true;
       }
-      return token;
+      return false;
     },
   },
   adapter: DrizzleAdapter(db, mysqlTable),
   providers: [
-    Credentials({
-      id: "credentials",
-      name: "Credentials",
-      credentials: {
-        email: {
-          label: "Email",
-          type: "text",
-          placeholder: "your@email.com",
+    EmailProvider({
+      server: {
+        host: env.EMAIL_SERVER,
+        port: env.EMAIL_PORT,
+        auth: {
+          user: env.EMAIL_USERNAME,
+          pass: env.EMAIL_PASSWORD,
         },
-        password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
-        try {
-          if (!credentials?.email || !credentials?.password) {
-            throw new Error("Invalid email or password");
-          }
-
-          const user = await db.query.users.findFirst({
-            where: eq(users.email, credentials.email),
-            with: {
-              accounts: true,
-            },
-          });
-
-          if (!user) {
-            throw new Error("Invalid email or password");
-          }
-
-          // const hasAccount = user.accounts.length > 0;
-          // if (hasAccount) {
-          //   // Need more work to show to the client which account to connect to
-          // }
-
-          if (!user.password) {
-            throw new Error("Password not set");
-          }
-          const valid = await bcrypt.compare(
-            credentials.password,
-            user.password,
-          );
-          if (!valid) {
-            throw new Error("Invalid email or password");
-          }
-
-          return {
-            id: user.id,
-            name: user.firstName + " " + user.lastName,
-            email: user.email,
-            image: user.image,
-          };
-        } catch (error) {
-          console.log("[AUTH]", error);
-          throw new Error("Internal error");
-        }
-      },
+      from: env.EMAIL_FROM,
     }),
     DiscordProvider({
       clientId: env.DISCORD_CLIENT_ID,
@@ -157,9 +102,6 @@ export const authOptions: NextAuthOptions = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
-  pages: {
-    signIn: "/signin",
-  },
 };
 
 /**

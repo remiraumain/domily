@@ -8,6 +8,7 @@ import {
   text,
   timestamp,
   varchar,
+  boolean,
 } from "drizzle-orm/mysql-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
@@ -43,11 +44,11 @@ export const users = mysqlTable("user", {
   name: varchar("name", { length: 255 }),
   birthday: timestamp("birthday", { mode: "date" }),
   email: varchar("email", { length: 255 }).notNull(),
-  password: varchar("password", { length: 255 }),
   emailVerified: timestamp("emailVerified", {
     mode: "date",
     fsp: 3,
   }).default(sql`CURRENT_TIMESTAMP(3)`),
+  completed: boolean("completed").default(false),
   image: varchar("image", { length: 255 }),
 });
 

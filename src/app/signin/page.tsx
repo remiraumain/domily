@@ -2,7 +2,7 @@
 
 import { SignInForm } from "./_components/signin-form";
 import { useFormSignIn } from "~/hooks/use-signin-store";
-import { Providers } from "./_components/providers";
+import { Providers } from "./_components/auth-providers";
 
 export default function Signin() {
   const { reset, type, provider } = useFormSignIn();

@@ -17,17 +17,20 @@ interface DatePickerProps {
   selected?: Date;
   onSelect?: SelectSingleEventHandler;
   minAge?: number;
+  isLoading?: boolean;
 }
 
 export function DatePicker({
   selected,
   onSelect,
   minAge = 0,
+  isLoading,
 }: DatePickerProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button
+          disabled={isLoading}
           variant={"outline"}
           className={cn(
             "w-[240px] justify-start text-left font-normal",

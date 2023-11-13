@@ -1,13 +1,16 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
-import { v4 as uuidv4 } from "uuid";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 import { users } from "~/server/db/schema";
 
 export const userRouter = createTRPCRouter({
-  shouldRegister: publicProcedure
+  exists: publicProcedure
     .input(z.object({ email: z.string().email() }))
     .mutation(async ({ ctx, input }) => {
       const user = await ctx.db.query.users.findFirst({
@@ -17,53 +20,56 @@ export const userRouter = createTRPCRouter({
         },
       });
       if (!user) {
-        return { value: true };
+        return { value: false, providers: null };
       }
-
-      if (user.accounts.length > 0) {
-        return { value: false, provider: user.accounts[0]?.provider };
-      }
-
-      return { value: false };
+      const providers = user.accounts.map((account) => account.provider);
+      return {
+        value: true,
+        providers,
+      };
     }),
 
-  create: publicProcedure
+  complete: protectedProcedure
     .input(
       z.object({
-        firstName: z.string().min(1),
-        lastName: z.string().min(1),
+        firstName: z.string(),
+        lastName: z.string(),
         birthday: z.date(),
-        email: z.string().email(),
-        password: z.string().min(8),
+        image: z.string().url().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const user = await ctx.db.query.users.findFirst({
-        where: eq(users.email, input.email),
-        with: {
-          accounts: true,
-        },
+        where: eq(users.id, ctx.session.user.id),
       });
-
-      if (!!user && user.accounts.length > 0) {
-        throw new Error(
-          `User already exists with a ${user.accounts[0]?.provider} account`,
-        );
+      if (!user) {
+        throw new Error("User not found");
       }
+      const updatedUser = await ctx.db
+        .update(users)
+        .set({
+          firstName: input.firstName,
+          lastName: input.lastName,
+          birthday: input.birthday,
+          image: input.image,
+          completed: true,
+        })
+        .where(eq(users.id, ctx.session.user.id));
 
-      if (!!user) {
-        throw new Error("User already exists");
-      }
-
-      const hashedPassword = await bcrypt.hash(input.password, 10);
-      await ctx.db.insert(users).values({
-        id: uuidv4(),
-        firstName: input.firstName,
-        lastName: input.lastName,
-        name: `${input.firstName} ${input.lastName}`,
-        birthday: input.birthday,
-        email: input.email,
-        password: hashedPassword,
-      });
+      return updatedUser;
     }),
+
+  isComplete: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.db.query.users.findFirst({
+      where: eq(users.id, ctx.session.user.id),
+    });
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // TODO: check if user has completed profile
+    console.log(user);
+
+    // If user has completed profile, change isComplete field to true and return true
+  }),
 });
